@@ -12,7 +12,7 @@ function PortfolioContent() {
   const { language, setLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
-  const [theme, setTheme] = useState('modern'); // 'modern', 'emerald', 'dark'
+  const [theme, setTheme] = useState('modern'); // 'modern', 'emerald', 'dark', 'purple', 'orange'
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -51,35 +51,14 @@ function PortfolioContent() {
   };
 
   const downloadCV = async () => {
-    // Obtener el contenido de cv.html y descargarlo como PDF
-    try {
-      const response = await fetch('/cv.html');
-      const htmlContent = await response.text();
-      
-      // Crear un contenedor temporal para el HTML
-      const container = document.createElement('div');
-      container.innerHTML = htmlContent;
-      
-      // Seleccionar el contenido de la página para el PDF
-      const element = container.querySelector('.page');
-      if (!element) return;
-
-      // Configuración de html2pdf
-      const opt = {
-        margin:       0,
-        filename:     'CV_Jhon_Jojoa.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      // Ejecutar la descarga
-      html2pdf().set(opt).from(element).save();
-    } catch (error) {
-      console.error('Error al descargar el PDF:', error);
-      // Fallback si algo falla: abrir en nueva pestaña
-      window.open('/cv.html', '_blank');
-    }
+    // Abrir el CV en una nueva pestaña y luego pedir que lo guarden como PDF
+    // Esto es mucho más robusto y rápido que html2pdf que a veces se bloquea
+    const link = document.createElement('a');
+    link.href = '/cv.html';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const navItems = [
@@ -161,6 +140,24 @@ function PortfolioContent() {
           btn: 'bg-blue-600 hover:bg-blue-700',
           navActive: 'text-blue-400 after:bg-blue-400'
         };
+      case 'purple':
+        return {
+          bg: 'from-purple-50 via-white to-purple-100',
+          accent: 'from-purple-600 to-indigo-600',
+          progress: 'from-purple-500 via-indigo-500 to-blue-500',
+          text: 'text-purple-600',
+          btn: 'bg-purple-600 hover:bg-purple-700',
+          navActive: 'text-purple-600 after:bg-purple-600'
+        };
+      case 'orange':
+        return {
+          bg: 'from-orange-50 via-white to-orange-100',
+          accent: 'from-orange-600 to-red-600',
+          progress: 'from-orange-500 via-red-500 to-yellow-500',
+          text: 'text-orange-600',
+          btn: 'bg-orange-600 hover:bg-orange-700',
+          navActive: 'text-orange-600 after:bg-orange-600'
+        };
       default: // modern (blue)
         return {
           bg: 'from-slate-50 via-white to-slate-100',
@@ -223,18 +220,28 @@ function PortfolioContent() {
                 <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-full gap-1">
                   <button 
                     onClick={() => setTheme('modern')}
-                    className={`w-6 h-6 rounded-full bg-blue-500 transition-transform ${theme === 'modern' ? 'scale-125 ring-2 ring-white' : 'opacity-50 hover:opacity-100'}`}
-                    title="Blue Theme"
+                    className={`w-5 h-5 rounded-full bg-blue-500 transition-transform ${theme === 'modern' ? 'scale-125 ring-2 ring-white' : 'opacity-50 hover:opacity-100'}`}
+                    title="Blue"
                   />
                   <button 
                     onClick={() => setTheme('emerald')}
-                    className={`w-6 h-6 rounded-full bg-emerald-500 transition-transform ${theme === 'emerald' ? 'scale-125 ring-2 ring-white' : 'opacity-50 hover:opacity-100'}`}
-                    title="Green Theme"
+                    className={`w-5 h-5 rounded-full bg-emerald-500 transition-transform ${theme === 'emerald' ? 'scale-125 ring-2 ring-white' : 'opacity-50 hover:opacity-100'}`}
+                    title="Emerald"
+                  />
+                  <button 
+                    onClick={() => setTheme('purple')}
+                    className={`w-5 h-5 rounded-full bg-purple-500 transition-transform ${theme === 'purple' ? 'scale-125 ring-2 ring-white' : 'opacity-50 hover:opacity-100'}`}
+                    title="Purple"
+                  />
+                  <button 
+                    onClick={() => setTheme('orange')}
+                    className={`w-5 h-5 rounded-full bg-orange-500 transition-transform ${theme === 'orange' ? 'scale-125 ring-2 ring-white' : 'opacity-50 hover:opacity-100'}`}
+                    title="Orange"
                   />
                   <button 
                     onClick={() => setTheme('dark')}
-                    className={`w-6 h-6 rounded-full bg-slate-900 transition-transform ${theme === 'dark' ? 'scale-125 ring-2 ring-white' : 'opacity-50 hover:opacity-100'}`}
-                    title="Dark Theme"
+                    className={`w-5 h-5 rounded-full bg-slate-900 transition-transform ${theme === 'dark' ? 'scale-125 ring-2 ring-white' : 'opacity-50 hover:opacity-100'}`}
+                    title="Dark"
                   />
                 </div>
 
@@ -287,9 +294,11 @@ function PortfolioContent() {
               
               <div className="flex items-center gap-4 px-4 py-3">
                 <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-full gap-2">
-                  <button onClick={() => setTheme('modern')} className="w-6 h-6 rounded-full bg-blue-500" />
-                  <button onClick={() => setTheme('emerald')} className="w-6 h-6 rounded-full bg-emerald-500" />
-                  <button onClick={() => setTheme('dark')} className="w-6 h-6 rounded-full bg-slate-900" />
+                  <button onClick={() => setTheme('modern')} className="w-5 h-5 rounded-full bg-blue-500" />
+                  <button onClick={() => setTheme('emerald')} className="w-5 h-5 rounded-full bg-emerald-500" />
+                  <button onClick={() => setTheme('purple')} className="w-5 h-5 rounded-full bg-purple-500" />
+                  <button onClick={() => setTheme('orange')} className="w-5 h-5 rounded-full bg-orange-500" />
+                  <button onClick={() => setTheme('dark')} className="w-5 h-5 rounded-full bg-slate-900" />
                 </div>
                 <button
                   onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
