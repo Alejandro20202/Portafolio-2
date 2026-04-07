@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { jsPDF } from 'jspdf';
+import html2pdf from 'html2pdf.js';
 import { motion, useScroll, useSpring } from 'motion/react';
 import { Menu, X, Code, Palette, Users, Briefcase, Mail, Phone, Github, Linkedin, ExternalLink, ChevronDown, Download, Star, GraduationCap, Calendar, Award, Globe, Languages } from 'lucide-react';
 import profileImage from '../assets/2ec0edd9fb8815761da0e17c25f9f82b7ba5a07d.png';
@@ -12,6 +12,7 @@ function PortfolioContent() {
   const { language, setLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
+  const [theme, setTheme] = useState('modern'); // 'modern', 'emerald', 'dark'
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -49,9 +50,36 @@ function PortfolioContent() {
     }
   };
 
-  const downloadCV = () => {
-    // Abrir el CV en una nueva pestaña para imprimirlo como PDF
-    window.open('/cv.html', '_blank');
+  const downloadCV = async () => {
+    // Obtener el contenido de cv.html y descargarlo como PDF
+    try {
+      const response = await fetch('/cv.html');
+      const htmlContent = await response.text();
+      
+      // Crear un contenedor temporal para el HTML
+      const container = document.createElement('div');
+      container.innerHTML = htmlContent;
+      
+      // Seleccionar el contenido de la página para el PDF
+      const element = container.querySelector('.page');
+      if (!element) return;
+
+      // Configuración de html2pdf
+      const opt = {
+        margin:       0,
+        filename:     'CV_Jhon_Jojoa.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      // Ejecutar la descarga
+      html2pdf().set(opt).from(element).save();
+    } catch (error) {
+      console.error('Error al descargar el PDF:', error);
+      // Fallback si algo falla: abrir en nueva pestaña
+      window.open('/cv.html', '_blank');
+    }
   };
 
   const navItems = [
@@ -113,56 +141,113 @@ function PortfolioContent() {
     }
   ];
 
+  const getThemeClasses = () => {
+    switch (theme) {
+      case 'emerald':
+        return {
+          bg: 'from-emerald-50 via-white to-emerald-100',
+          accent: 'from-emerald-600 to-teal-600',
+          progress: 'from-emerald-500 via-teal-500 to-cyan-500',
+          text: 'text-emerald-600',
+          btn: 'bg-emerald-600 hover:bg-emerald-700',
+          navActive: 'text-emerald-600 after:bg-emerald-600'
+        };
+      case 'dark':
+        return {
+          bg: 'from-slate-950 via-slate-900 to-slate-950',
+          accent: 'from-blue-500 to-purple-500',
+          progress: 'from-blue-400 via-purple-400 to-pink-400',
+          text: 'text-blue-400',
+          btn: 'bg-blue-600 hover:bg-blue-700',
+          navActive: 'text-blue-400 after:bg-blue-400'
+        };
+      default: // modern (blue)
+        return {
+          bg: 'from-slate-50 via-white to-slate-100',
+          accent: 'from-blue-600 to-purple-600',
+          progress: 'from-blue-500 via-purple-500 to-pink-500',
+          text: 'text-blue-600',
+          btn: 'bg-blue-600 hover:bg-blue-700',
+          navActive: 'text-blue-600 after:bg-blue-600'
+        };
+    }
+  };
+
+  const themeClasses = getThemeClasses();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+    <div className={`min-h-screen bg-gradient-to-br ${themeClasses.bg} ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
       {/* Progress Bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 origin-left z-50"
+        className={`fixed top-0 left-0 right-0 h-1 bg-gradient-to-r ${themeClasses.progress} origin-left z-50`}
         style={{ scaleX }}
       />
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-sm z-40">
+      <nav className={`fixed top-0 left-0 right-0 ${theme === 'dark' ? 'bg-slate-900/80' : 'bg-white/80'} backdrop-blur-md shadow-sm z-40`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => scrollToSection('inicio')}
             >
-              Jhon A. Jojoa
+              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${themeClasses.accent} flex items-center justify-center text-white font-bold text-xl`}>
+                J
+              </div>
+              <span className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>Jhon Jojoa</span>
             </motion.div>
 
             {/* Desktop Menu */}
-            <div className="hidden md:flex space-x-6 items-center">
+            <div className="hidden md:flex items-center gap-8">
               {navItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
-                  className={`text-sm font-medium transition-colors hover:text-blue-600 relative ${
-                    activeSection === item.id ? 'text-blue-600' : 'text-gray-600'
+                  className={`relative text-sm font-medium transition-colors ${
+                    activeSection === item.id 
+                      ? themeClasses.text 
+                      : (theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')
+                  } ${
+                    activeSection === item.id ? 'after:absolute after:-bottom-1 after:left-0 after:w-full after:h-0.5 after:bg-current' : ''
                   }`}
                 >
                   {item.label}
-                  {activeSection === item.id && (
-                    <motion.div
-                      layoutId="activeSection"
-                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-600"
-                    />
-                  )}
                 </button>
               ))}
               
-              {/* Language Switcher */}
-              <div className="flex items-center gap-2 ml-2">
+              <div className="flex items-center gap-3 ml-4 border-l border-slate-200 pl-6">
+                {/* Theme Switcher */}
+                <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-full gap-1">
+                  <button 
+                    onClick={() => setTheme('modern')}
+                    className={`w-6 h-6 rounded-full bg-blue-500 transition-transform ${theme === 'modern' ? 'scale-125 ring-2 ring-white' : 'opacity-50 hover:opacity-100'}`}
+                    title="Blue Theme"
+                  />
+                  <button 
+                    onClick={() => setTheme('emerald')}
+                    className={`w-6 h-6 rounded-full bg-emerald-500 transition-transform ${theme === 'emerald' ? 'scale-125 ring-2 ring-white' : 'opacity-50 hover:opacity-100'}`}
+                    title="Green Theme"
+                  />
+                  <button 
+                    onClick={() => setTheme('dark')}
+                    className={`w-6 h-6 rounded-full bg-slate-900 transition-transform ${theme === 'dark' ? 'scale-125 ring-2 ring-white' : 'opacity-50 hover:opacity-100'}`}
+                    title="Dark Theme"
+                  />
+                </div>
+
                 <button
                   onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
-                  className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 rounded-full transition-all"
-                  title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border-2 transition-all ${
+                    theme === 'dark' 
+                      ? 'border-slate-700 text-slate-300 hover:border-blue-500 hover:text-blue-500' 
+                      : 'border-slate-200 text-slate-600 hover:border-blue-600 hover:text-blue-600'
+                  }`}
                 >
-                  <Languages className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-700">{language.toUpperCase()}</span>
+                  <Languages className="w-3.5 h-3.5" />
+                  {language === 'es' ? 'ES' : 'EN'}
                 </button>
               </div>
             </div>
@@ -170,7 +255,7 @@ function PortfolioContent() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className={`md:hidden p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-slate-800 text-white' : 'hover:bg-slate-100 text-slate-600'}`}
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -183,7 +268,7 @@ function PortfolioContent() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden bg-white border-t border-gray-200"
+            className={`md:hidden border-t ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
           >
             <div className="px-4 py-2 space-y-1">
               {navItems.map((item) => (
@@ -192,22 +277,30 @@ function PortfolioContent() {
                   onClick={() => scrollToSection(item.id)}
                   className={`block w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                     activeSection === item.id
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'text-gray-600 hover:bg-gray-50'
+                      ? `${theme === 'dark' ? 'bg-slate-800 text-blue-400' : 'bg-blue-50 text-blue-600'}`
+                      : `${theme === 'dark' ? 'text-slate-400 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-50'}`
                   }`}
                 >
                   {item.label}
                 </button>
               ))}
               
-              {/* Mobile Language Switcher */}
-              <button
-                onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
-                className="flex items-center gap-2 w-full px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-              >
-                <Languages className="w-5 h-5 text-blue-600" />
-                {language === 'es' ? 'English' : 'Español'}
-              </button>
+              <div className="flex items-center gap-4 px-4 py-3">
+                <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-full gap-2">
+                  <button onClick={() => setTheme('modern')} className="w-6 h-6 rounded-full bg-blue-500" />
+                  <button onClick={() => setTheme('emerald')} className="w-6 h-6 rounded-full bg-emerald-500" />
+                  <button onClick={() => setTheme('dark')} className="w-6 h-6 rounded-full bg-slate-900" />
+                </div>
+                <button
+                  onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+                  className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border-2 ${
+                    theme === 'dark' ? 'border-slate-700 text-slate-300' : 'border-slate-200 text-slate-600'
+                  }`}
+                >
+                  <Languages className="w-4 h-4" />
+                  {language === 'es' ? 'ES' : 'EN'}
+                </button>
+              </div>
             </div>
           </motion.div>
         )}
@@ -226,10 +319,10 @@ function PortfolioContent() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-4xl sm:text-5xl lg:text-6xl mb-6"
+              className="text-4xl sm:text-5xl lg:text-6xl mb-6 font-bold"
             >
               {t.hero.greeting}{' '}
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <span className={`bg-gradient-to-r ${themeClasses.progress} bg-clip-text text-transparent`}>
                 {t.hero.name}
               </span>
             </motion.h1>
@@ -237,7 +330,7 @@ function PortfolioContent() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="text-lg sm:text-xl text-gray-600 mb-8"
+              className={`text-lg sm:text-xl mb-8 ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}
             >
               {t.hero.description}
             </motion.p>
@@ -249,20 +342,28 @@ function PortfolioContent() {
             >
               <button
                 onClick={() => scrollToSection('proyectos')}
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all"
+                className={`px-8 py-3 bg-gradient-to-r ${themeClasses.accent} text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all`}
               >
                 {t.hero.viewProjects}
               </button>
               <button
                 onClick={downloadCV}
-                className="px-8 py-3 border-2 border-blue-600 text-blue-600 rounded-full font-medium hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2"
+                className={`px-8 py-3 border-2 rounded-full font-medium hover:scale-105 transition-all flex items-center gap-2 ${
+                  theme === 'dark' 
+                    ? 'border-blue-500 text-blue-400 hover:bg-blue-500/10' 
+                    : 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
+                }`}
               >
                 <Download className="w-5 h-5" />
                 {t.hero.downloadCV}
               </button>
               <button
                 onClick={() => scrollToSection('contacto')}
-                className="px-8 py-3 border-2 border-gray-300 rounded-full font-medium hover:border-blue-600 hover:text-blue-600 transition-all"
+                className={`px-8 py-3 border-2 rounded-full font-medium hover:scale-105 transition-all flex items-center gap-2 ${
+                  theme === 'dark' 
+                    ? 'border-slate-700 text-slate-300 hover:bg-slate-800' 
+                    : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                }`}
               >
                 {t.hero.contact}
               </button>
@@ -298,7 +399,7 @@ function PortfolioContent() {
       </section>
 
       {/* About Section */}
-      <section id="sobre-mi" className="py-20 px-4 bg-white">
+      <section id="sobre-mi" className={`py-20 px-4 ${theme === 'dark' ? 'bg-slate-900/50' : 'bg-white'}`}>
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -306,27 +407,27 @@ function PortfolioContent() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl sm:text-4xl text-center mb-12">
-              {t.about.title}<span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{t.about.titleHighlight}</span>
+            <h2 className="text-3xl sm:text-4xl text-center mb-12 font-bold">
+              {t.about.title}<span className={`bg-gradient-to-r ${themeClasses.progress} bg-clip-text text-transparent`}>{t.about.titleHighlight}</span>
             </h2>
 
             {/* About Me Content */}
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 sm:p-12 mb-12">
-              <p className="text-gray-700 text-lg leading-relaxed mb-6">
+            <div className={`${theme === 'dark' ? 'bg-slate-800/50' : 'bg-gradient-to-br from-blue-50 to-purple-50'} rounded-2xl p-8 sm:p-12 mb-12`}>
+              <p className={`${theme === 'dark' ? 'text-slate-300' : 'text-gray-700'} text-lg leading-relaxed mb-6`}>
                 {t.about.paragraph1}
               </p>
-              <p className="text-gray-700 text-lg leading-relaxed mb-6">
+              <p className={`${theme === 'dark' ? 'text-slate-300' : 'text-gray-700'} text-lg leading-relaxed mb-6`}>
                 {t.about.paragraph2}
               </p>
-              <p className="text-gray-700 text-lg leading-relaxed">
+              <p className={`${theme === 'dark' ? 'text-slate-300' : 'text-gray-700'} text-lg leading-relaxed`}>
                 {t.about.paragraph3}
               </p>
             </div>
 
             {/* Certifications Section */}
             <div className="mt-12">
-              <h3 className="text-2xl sm:text-3xl text-center mb-8">
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{t.about.certificationsTitle}</span>
+              <h3 className="text-2xl sm:text-3xl text-center mb-8 font-bold">
+                <span className={`bg-gradient-to-r ${themeClasses.progress} bg-clip-text text-transparent`}>{t.about.certificationsTitle}</span>
               </h3>
               <div className="grid md:grid-cols-2 gap-8">
                 <motion.div
@@ -335,9 +436,9 @@ function PortfolioContent() {
                   viewport={{ once: true }}
                   transition={{ delay: 0.2 }}
                   whileHover={{ y: -5 }}
-                  className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group"
+                  className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'} border rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group`}
                 >
-                  <div className="aspect-[3/4] overflow-hidden">
+                  <div className="aspect-[3/4] overflow-hidden bg-white p-4">
                     <img
                       src={cert1}
                       alt={t.about.cert1Title}
@@ -346,10 +447,10 @@ function PortfolioContent() {
                   </div>
                   <div className="p-6">
                     <div className="flex items-center gap-2 mb-3">
-                      <Award className="w-5 h-5 text-blue-600" />
+                      <Award className={`w-5 h-5 ${themeClasses.text}`} />
                       <h4 className="font-semibold text-lg">{t.about.cert1Title}</h4>
                     </div>
-                    <p className="text-gray-600 text-sm mb-2">{t.about.cert1Desc}</p>
+                    <p className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} text-sm mb-2`}>{t.about.cert1Desc}</p>
                     <p className="text-gray-500 text-sm">{t.about.cert1Date}</p>
                   </div>
                 </motion.div>
@@ -360,9 +461,9 @@ function PortfolioContent() {
                   viewport={{ once: true }}
                   transition={{ delay: 0.3 }}
                   whileHover={{ y: -5 }}
-                  className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group"
+                  className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'} border rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group`}
                 >
-                  <div className="aspect-[3/4] overflow-hidden">
+                  <div className="aspect-[3/4] overflow-hidden bg-white p-4">
                     <img
                       src={cert2}
                       alt={t.about.cert2Title}
@@ -371,10 +472,10 @@ function PortfolioContent() {
                   </div>
                   <div className="p-6">
                     <div className="flex items-center gap-2 mb-3">
-                      <Award className="w-5 h-5 text-purple-600" />
+                      <Award className={`w-5 h-5 ${themeClasses.text}`} />
                       <h4 className="font-semibold text-lg">{t.about.cert2Title}</h4>
                     </div>
-                    <p className="text-gray-600 text-sm mb-2">{t.about.cert2Desc}</p>
+                    <p className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} text-sm mb-2`}>{t.about.cert2Desc}</p>
                     <p className="text-gray-500 text-sm">{t.about.cert2Date}</p>
                   </div>
                 </motion.div>
@@ -393,8 +494,8 @@ function PortfolioContent() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl sm:text-4xl text-center mb-12">
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{t.experience.title}</span>
+            <h2 className="text-3xl sm:text-4xl text-center mb-12 font-bold">
+              <span className={`bg-gradient-to-r ${themeClasses.progress} bg-clip-text text-transparent`}>{t.experience.title}</span>
             </h2>
             
             <div className="space-y-8">
@@ -404,23 +505,23 @@ function PortfolioContent() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
-                className="relative pl-8 border-l-4 border-blue-500"
+                className={`relative pl-8 border-l-4 ${theme === 'dark' ? 'border-blue-500' : 'border-blue-500'}`}
               >
                 <div className="absolute -left-3 top-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                   <GraduationCap className="w-3 h-3 text-white" />
                 </div>
-                <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all">
+                <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'} border rounded-xl p-6 shadow-lg hover:shadow-xl transition-all`}>
                   <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
                     <div>
-                      <h3 className="text-xl sm:text-2xl mb-2">{t.experience.academic.title}</h3>
-                      <p className="text-gray-600 font-medium">{t.experience.academic.institution}</p>
+                      <h3 className="text-xl sm:text-2xl mb-2 font-bold">{t.experience.academic.title}</h3>
+                      <p className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} font-medium`}>{t.experience.academic.institution}</p>
                     </div>
                     <div className="flex items-center gap-2 text-gray-500 text-sm">
                       <Calendar className="w-4 h-4" />
                       <span>{t.experience.academic.status}</span>
                     </div>
                   </div>
-                  <p className="text-gray-700 leading-relaxed">
+                  <p className={`${theme === 'dark' ? 'text-slate-300' : 'text-gray-700'} leading-relaxed`}>
                     {t.experience.academic.description}
                   </p>
                 </div>
@@ -432,33 +533,33 @@ function PortfolioContent() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
-                className="relative pl-8 border-l-4 border-purple-500"
+                className={`relative pl-8 border-l-4 ${theme === 'dark' ? 'border-purple-500' : 'border-purple-500'}`}
               >
                 <div className="absolute -left-3 top-0 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
                   <Briefcase className="w-3 h-3 text-white" />
                 </div>
-                <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all">
+                <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'} border rounded-xl p-6 shadow-lg hover:shadow-xl transition-all`}>
                   <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
                     <div>
-                      <h3 className="text-xl sm:text-2xl mb-2">{t.experience.projects.title}</h3>
-                      <p className="text-gray-600 font-medium">{t.experience.projects.subtitle}</p>
+                      <h3 className="text-xl sm:text-2xl mb-2 font-bold">{t.experience.projects.title}</h3>
+                      <p className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} font-medium`}>{t.experience.projects.subtitle}</p>
                     </div>
                     <div className="flex items-center gap-2 text-gray-500 text-sm">
                       <Calendar className="w-4 h-4" />
                       <span>{t.experience.projects.date}</span>
                     </div>
                   </div>
-                  <ul className="space-y-2 text-gray-700">
+                  <ul className={`space-y-2 ${theme === 'dark' ? 'text-slate-300' : 'text-gray-700'}`}>
                     <li className="flex items-start gap-2">
-                      <span className="text-blue-500 mt-1">•</span>
+                      <span className={`${themeClasses.text} mt-1`}>•</span>
                       <span>{t.experience.projects.item1}</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-blue-500 mt-1">•</span>
+                      <span className={`${themeClasses.text} mt-1`}>•</span>
                       <span>{t.experience.projects.item2}</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-blue-500 mt-1">•</span>
+                      <span className={`${themeClasses.text} mt-1`}>•</span>
                       <span>{t.experience.projects.item3}</span>
                     </li>
                   </ul>
@@ -471,23 +572,23 @@ function PortfolioContent() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.4 }}
-                className="relative pl-8 border-l-4 border-pink-500"
+                className={`relative pl-8 border-l-4 ${theme === 'dark' ? 'border-pink-500' : 'border-pink-500'}`}
               >
                 <div className="absolute -left-3 top-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
                   <Users className="w-3 h-3 text-white" />
                 </div>
-                <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all">
+                <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'} border rounded-xl p-6 shadow-lg hover:shadow-xl transition-all`}>
                   <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
                     <div>
-                      <h3 className="text-xl sm:text-2xl mb-2">{t.experience.personal.title}</h3>
-                      <p className="text-gray-600 font-medium">{t.experience.personal.subtitle}</p>
+                      <h3 className="text-xl sm:text-2xl mb-2 font-bold">{t.experience.personal.title}</h3>
+                      <p className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} font-medium`}>{t.experience.personal.subtitle}</p>
                     </div>
                     <div className="flex items-center gap-2 text-gray-500 text-sm">
                       <Calendar className="w-4 h-4" />
                       <span>{t.experience.personal.date}</span>
                     </div>
                   </div>
-                  <p className="text-gray-700 leading-relaxed">
+                  <p className={`${theme === 'dark' ? 'text-slate-300' : 'text-gray-700'} leading-relaxed`}>
                     {t.experience.personal.description}
                   </p>
                 </div>
@@ -498,7 +599,7 @@ function PortfolioContent() {
       </section>
 
       {/* Skills Section */}
-      <section id="habilidades" className="py-20 px-4 bg-white">
+      <section id="habilidades" className={`py-20 px-4 ${theme === 'dark' ? 'bg-slate-900/50' : 'bg-white'}`}>
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -506,8 +607,8 @@ function PortfolioContent() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl sm:text-4xl text-center mb-12">
-              {t.skills.title}<span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{t.skills.titleHighlight}</span>
+            <h2 className="text-3xl sm:text-4xl text-center mb-12 font-bold">
+              {t.skills.title}<span className={`bg-gradient-to-r ${themeClasses.progress} bg-clip-text text-transparent`}>{t.skills.titleHighlight}</span>
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {t.skills.items.map((skill, index) => {
@@ -521,13 +622,13 @@ function PortfolioContent() {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                     whileHover={{ y: -5, scale: 1.02 }}
-                    className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all"
+                    className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'} border rounded-xl p-6 shadow-lg hover:shadow-xl transition-all`}
                   >
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mb-4">
+                    <div className={`w-12 h-12 bg-gradient-to-br ${themeClasses.accent} rounded-lg flex items-center justify-center mb-4`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="text-xl mb-2">{skill.title}</h3>
-                    <p className="text-gray-600">{skill.desc}</p>
+                    <h3 className="text-xl mb-2 font-bold">{skill.title}</h3>
+                    <p className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'}`}>{skill.desc}</p>
                   </motion.div>
                 );
               })}
@@ -537,7 +638,7 @@ function PortfolioContent() {
       </section>
 
       {/* Projects Section */}
-      <section id="proyectos" className="py-20 px-4 bg-white">
+      <section id="proyectos" className={`py-20 px-4 ${theme === 'dark' ? 'bg-slate-900' : 'bg-white'}`}>
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -545,8 +646,8 @@ function PortfolioContent() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl sm:text-4xl text-center mb-12">
-              {t.projects.title}<span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{t.projects.titleHighlight}</span>
+            <h2 className="text-3xl sm:text-4xl text-center mb-12 font-bold">
+              {t.projects.title}<span className={`bg-gradient-to-r ${themeClasses.progress} bg-clip-text text-transparent`}>{t.projects.titleHighlight}</span>
             </h2>
             <div className="grid md:grid-cols-3 gap-8">
               {/* Featured Project */}
@@ -556,7 +657,7 @@ function PortfolioContent() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
                 whileHover={{ y: -10 }}
-                className="md:col-span-2 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl overflow-hidden shadow-xl group"
+                className={`md:col-span-2 ${theme === 'dark' ? 'bg-slate-800/50 border-slate-700' : 'bg-gradient-to-br from-blue-50 to-purple-50'} border rounded-2xl overflow-hidden shadow-xl group`}
               >
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="aspect-video md:aspect-auto overflow-hidden">
@@ -567,11 +668,11 @@ function PortfolioContent() {
                     />
                   </div>
                   <div className="p-8 flex flex-col justify-center">
-                    <div className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm mb-4 w-fit">
+                    <div className={`inline-block px-3 py-1 ${theme === 'dark' ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-600'} rounded-full text-sm mb-4 w-fit font-bold`}>
                       {t.projects.featured}
                     </div>
-                    <h3 className="text-2xl sm:text-3xl mb-4">{t.projects.items[0].title}</h3>
-                    <p className="text-gray-700 mb-6 leading-relaxed">
+                    <h3 className="text-2xl sm:text-3xl mb-4 font-bold">{t.projects.items[0].title}</h3>
+                    <p className={`${theme === 'dark' ? 'text-slate-300' : 'text-gray-700'} mb-6 leading-relaxed`}>
                       {t.projects.items[0].desc}
                     </p>
                     <div className="flex flex-wrap gap-3">
@@ -579,7 +680,7 @@ function PortfolioContent() {
                         href="https://fernandorosero91.github.io/interfacesjuegos/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all"
+                        className={`inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${themeClasses.accent} text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all`}
                       >
                         {t.projects.viewDemo}
                         <ExternalLink className="w-4 h-4" />
@@ -588,7 +689,7 @@ function PortfolioContent() {
                         href="https://github.com/Alejandro20202"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all"
+                        className={`inline-flex items-center gap-2 px-6 py-3 ${theme === 'dark' ? 'bg-slate-700 text-white' : 'bg-gray-800 text-white'} rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all`}
                       >
                         <Github className="w-4 h-4" />
                         {t.projects.github}
@@ -607,7 +708,7 @@ function PortfolioContent() {
                   viewport={{ once: true }}
                   transition={{ delay: 0.2 + index * 0.1 }}
                   whileHover={{ y: -10 }}
-                  className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group"
+                  className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'} border rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group`}
                 >
                   <div className="aspect-video overflow-hidden">
                     <img
@@ -617,14 +718,14 @@ function PortfolioContent() {
                     />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl mb-3">{project.title}</h3>
-                    <p className="text-gray-600 leading-relaxed mb-4">{project.desc}</p>
+                    <h3 className="text-xl mb-3 font-bold">{project.title}</h3>
+                    <p className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} leading-relaxed mb-4`}>{project.desc}</p>
                     <div className="flex gap-3">
                       <a
                         href={project.demo}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                        className={`flex items-center gap-2 px-4 py-2 ${themeClasses.btn} text-white rounded-lg text-sm font-medium transition-colors`}
                       >
                         <ExternalLink className="w-4 h-4" />
                         {t.projects.demo}
@@ -633,7 +734,7 @@ function PortfolioContent() {
                         href={project.github}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium hover:bg-gray-900 transition-colors"
+                        className={`flex items-center gap-2 px-4 py-2 ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-gray-800 hover:bg-gray-900'} text-white rounded-lg text-sm font-medium transition-colors`}
                       >
                         <Github className="w-4 h-4" />
                         {t.projects.github}
@@ -648,7 +749,7 @@ function PortfolioContent() {
       </section>
 
       {/* Technologies Section */}
-      <section id="tecnologias" className="py-20 px-4 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <section id="tecnologias" className={`py-20 px-4 ${theme === 'dark' ? 'bg-slate-950' : 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900'}`}>
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -656,8 +757,8 @@ function PortfolioContent() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl sm:text-4xl text-center mb-4">
-              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{t.technologies.title}</span>
+            <h2 className="text-3xl sm:text-4xl text-center mb-4 font-bold">
+              <span className={`bg-gradient-to-r ${themeClasses.progress} bg-clip-text text-transparent`}>{t.technologies.title}</span>
             </h2>
             <p className="text-gray-300 text-center mb-12 max-w-2xl mx-auto">
               {t.technologies.subtitle}
@@ -771,7 +872,7 @@ function PortfolioContent() {
       </section>
 
       {/* Testimonials Section */}
-      <section id="testimonios" className="py-20 px-4 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <section id="testimonios" className={`py-20 px-4 ${theme === 'dark' ? 'bg-slate-900/50' : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'}`}>
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -779,10 +880,10 @@ function PortfolioContent() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl sm:text-4xl text-center mb-4">
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{t.testimonials.title}</span>
+            <h2 className="text-3xl sm:text-4xl text-center mb-4 font-bold">
+              <span className={`bg-gradient-to-r ${themeClasses.progress} bg-clip-text text-transparent`}>{t.testimonials.title}</span>
             </h2>
-            <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+            <p className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} text-center mb-12 max-w-2xl mx-auto`}>
               {t.testimonials.subtitle}
             </p>
             
@@ -795,25 +896,27 @@ function PortfolioContent() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -10 }}
-                  className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all"
+                  className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'} border rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all`}
                 >
                   <div className="flex items-center gap-4 mb-6">
-                    <img
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
+                    <div className={`w-14 h-14 rounded-full overflow-hidden border-2 ${themeClasses.text}`}>
+                      <img
+                        src={testimonial.image}
+                        alt={testimonial.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     <div>
-                      <h3 className="font-medium text-lg">{testimonial.name}</h3>
-                      <p className="text-sm text-gray-600">{testimonial.role}</p>
+                      <h4 className="font-bold text-lg">{testimonial.name}</h4>
+                      <p className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} text-sm`}>{testimonial.role}</p>
                     </div>
                   </div>
-                  <div className="flex gap-1 mb-4">
+                  <div className="flex mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                      <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
                     ))}
                   </div>
-                  <p className="text-gray-700 leading-relaxed italic">
+                  <p className={`${theme === 'dark' ? 'text-slate-300' : 'text-gray-700'} italic leading-relaxed`}>
                     "{testimonial.text}"
                   </p>
                 </motion.div>
@@ -824,7 +927,7 @@ function PortfolioContent() {
       </section>
 
       {/* Contact Section */}
-      <section id="contacto" className="py-20 px-4 bg-white">
+      <section id="contacto" className={`py-20 px-4 ${theme === 'dark' ? 'bg-slate-900' : 'bg-white'}`}>
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -832,39 +935,39 @@ function PortfolioContent() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl sm:text-4xl text-center mb-12">
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{t.contact.title}</span>
+            <h2 className="text-3xl sm:text-4xl text-center mb-12 font-bold">
+              <span className={`bg-gradient-to-r ${themeClasses.progress} bg-clip-text text-transparent`}>{t.contact.title}</span>
             </h2>
-            <div className="bg-white rounded-2xl p-8 sm:p-12 shadow-xl border-2 border-gray-100">
-              <p className="text-gray-700 text-lg text-center mb-8">
+            <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-2xl p-8 sm:p-12 shadow-xl border-2`}>
+              <p className={`${theme === 'dark' ? 'text-slate-300' : 'text-gray-700'} text-lg text-center mb-8`}>
                 {t.contact.subtitle}
               </p>
               <div className="grid sm:grid-cols-2 gap-6">
                 <motion.a
                   href="mailto:am5314284@gmail.com"
                   whileHover={{ scale: 1.05 }}
-                  className="flex items-center gap-4 p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl hover:shadow-lg transition-all"
+                  className={`flex items-center gap-4 p-6 ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-gradient-to-br from-blue-50 to-blue-100'} rounded-xl hover:shadow-lg transition-all`}
                 >
-                  <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className={`w-12 h-12 ${theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'} rounded-full flex items-center justify-center flex-shrink-0`}>
                     <Mail className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <div className="text-sm text-gray-600 mb-1">{t.contact.email}</div>
-                    <div className="font-medium text-gray-900">am5314284@gmail.com</div>
+                    <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} text-sm mb-1`}>{t.contact.email}</div>
+                    <div className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>am5314284@gmail.com</div>
                   </div>
                 </motion.a>
 
                 <motion.a
                   href="tel:3236000339"
                   whileHover={{ scale: 1.05 }}
-                  className="flex items-center gap-4 p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl hover:shadow-lg transition-all"
+                  className={`flex items-center gap-4 p-6 ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-gradient-to-br from-purple-50 to-purple-100'} rounded-xl hover:shadow-lg transition-all`}
                 >
-                  <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className={`w-12 h-12 ${theme === 'dark' ? 'bg-purple-600' : 'bg-purple-500'} rounded-full flex items-center justify-center flex-shrink-0`}>
                     <Phone className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <div className="text-sm text-gray-600 mb-1">{t.contact.phone}</div>
-                    <div className="font-medium text-gray-900">323 600 0339</div>
+                    <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} text-sm mb-1`}>{t.contact.phone}</div>
+                    <div className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>323 600 0339</div>
                   </div>
                 </motion.a>
 
@@ -873,33 +976,33 @@ function PortfolioContent() {
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.05 }}
-                  className="flex items-center gap-4 p-6 bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl hover:shadow-lg transition-all"
+                  className={`flex items-center gap-4 p-6 ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-gradient-to-br from-pink-50 to-pink-100'} rounded-xl hover:shadow-lg transition-all`}
                 >
-                  <div className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className={`w-12 h-12 ${theme === 'dark' ? 'bg-slate-600' : 'bg-gray-800'} rounded-full flex items-center justify-center flex-shrink-0`}>
                     <Github className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <div className="text-sm text-gray-600 mb-1">{t.contact.github}</div>
-                    <div className="font-medium text-gray-900">Alejandro20202</div>
+                    <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} text-sm mb-1`}>{t.contact.github}</div>
+                    <div className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Alejandro20202</div>
                   </div>
                 </motion.a>
 
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className="flex items-center gap-4 p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl hover:shadow-lg transition-all"
+                  className={`flex items-center gap-4 p-6 ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-gradient-to-br from-orange-50 to-orange-100'} rounded-xl hover:shadow-lg transition-all`}
                 >
-                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className={`w-12 h-12 ${theme === 'dark' ? 'bg-orange-600' : 'bg-orange-500'} rounded-full flex items-center justify-center flex-shrink-0`}>
                     <Linkedin className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <div className="text-sm text-gray-600 mb-1">{t.contact.linkedin}</div>
-                    <div className="font-medium text-gray-900">{t.contact.linkedinText}</div>
+                    <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} text-sm mb-1`}>{t.contact.linkedin}</div>
+                    <div className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{t.contact.linkedinText}</div>
                   </div>
                 </motion.div>
               </div>
 
-              <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl">
-                <p className="text-center text-gray-700">
+              <div className={`mt-8 p-6 ${theme === 'dark' ? 'bg-slate-700/50' : 'bg-gradient-to-r from-blue-50 to-purple-50'} rounded-xl`}>
+                <p className={`text-center ${theme === 'dark' ? 'text-slate-300' : 'text-gray-700'}`}>
                   {t.contact.availability}
                 </p>
               </div>
@@ -909,16 +1012,16 @@ function PortfolioContent() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 px-4">
+      <footer className={`${theme === 'dark' ? 'bg-slate-950 border-t border-slate-800' : 'bg-gray-900'} text-white py-8 px-4`}>
         <div className="max-w-6xl mx-auto text-center">
-          <div className="text-xl mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          <div className={`text-xl mb-4 bg-gradient-to-r ${themeClasses.progress} bg-clip-text text-transparent font-bold`}>
             {t.footer.name}
           </div>
           <p className="text-gray-400 mb-4">{t.footer.role}</p>
           <div className="flex justify-center gap-4 mb-4">
             <a
               href="mailto:am5314284@gmail.com"
-              className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
+              className={`w-10 h-10 ${theme === 'dark' ? 'bg-slate-800 hover:bg-blue-600' : 'bg-gray-800 hover:bg-blue-600'} rounded-full flex items-center justify-center transition-colors`}
             >
               <Mail className="w-5 h-5" />
             </a>
@@ -926,7 +1029,7 @@ function PortfolioContent() {
               href="https://github.com/Alejandro20202"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
+              className={`w-10 h-10 ${theme === 'dark' ? 'bg-slate-800 hover:bg-blue-600' : 'bg-gray-800 hover:bg-blue-600'} rounded-full flex items-center justify-center transition-colors`}
             >
               <Github className="w-5 h-5" />
             </a>
