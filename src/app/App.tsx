@@ -50,57 +50,8 @@ function PortfolioContent() {
   };
 
   const downloadCV = () => {
-    const doc = new jsPDF();
-    const margin = 20;
-    let y = margin;
-
-    // Header
-    doc.setFontSize(22);
-    doc.setTextColor(0, 0, 0);
-    doc.text('JHON ALEJANDRO JOJOA MOLINA', margin, y);
-    y += 10;
-    
-    doc.setFontSize(14);
-    doc.setTextColor(100, 100, 100);
-    doc.text(t.footer.role, margin, y);
-    y += 15;
-
-    // Contact Info
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Email: am5314284@gmail.com`, margin, y);
-    y += 7;
-    doc.text(`${t.contact.phone}: 323 600 0339`, margin, y);
-    y += 7;
-    doc.text(`GitHub: github.com/Alejandro20202`, margin, y);
-    y += 15;
-
-    // About Me
-    doc.setFontSize(16);
-    doc.text(t.nav.sobreMi, margin, y);
-    y += 10;
-    doc.setFontSize(11);
-    const splitDescription = doc.splitTextToSize(t.hero.description, 170);
-    doc.text(splitDescription, margin, y);
-    y += (splitDescription.length * 6) + 10;
-
-    // Education
-    doc.setFontSize(16);
-    doc.text(t.experience.academic.title, margin, y);
-    y += 10;
-    doc.setFontSize(11);
-    doc.text(`${t.experience.academic.institution} (${t.experience.academic.status})`, margin, y);
-    y += 15;
-
-    // Skills (Briefly)
-    doc.setFontSize(16);
-    doc.text(t.nav.habilidades, margin, y);
-    y += 10;
-    doc.setFontSize(11);
-    const skills = ['React', 'TypeScript', 'Tailwind CSS', 'Next.js', 'PostgreSQL'];
-    doc.text(skills.join(' | '), margin, y);
-    
-    doc.save('CV_Jhon_Jojoa.pdf');
+    // Abrir el CV en una nueva pestaña para imprimirlo como PDF
+    window.open('/cv.html', '_blank');
   };
 
   const navItems = [

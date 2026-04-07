@@ -1,0 +1,309 @@
+<!DOCTYPE html> 
+ <html lang="es"> 
+ <head> 
+   <meta charset="UTF-8" /> 
+   <meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
+   <title>CV — Jhon Alejandro Jojoa Molina</title> 
+   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/> 
+   <style> 
+     :root { 
+       --bg: #ffffff; 
+       --surface: #fcfcfc; 
+       --card: #f8f8f8; 
+       --accent: #4a7c00; 
+       --accent2: #2e7d32; 
+       --text: #111111; 
+       --muted: #555555; 
+       --border: #dddddd; 
+     } 
+  
+     * { box-sizing: border-box; margin: 0; padding: 0; } 
+  
+     body { 
+       background: var(--bg); 
+       color: var(--text); 
+       font-family: 'DM Sans', sans-serif; 
+       font-weight: 400; 
+       line-height: 1.6; 
+       min-height: 100vh; 
+     } 
+  
+     /* ── PRINT / PDF ── */ 
+     @media print { 
+       body { background: #fff; color: #111; } 
+       .no-print { display: none !important; } 
+       .page { max-width: 100%; padding: 0; margin: 0; } 
+     } 
+  
+     /* ── LAYOUT ── */ 
+     .page { 
+       max-width: 860px; 
+       margin: 0 auto; 
+       padding: 40px; 
+     } 
+  
+     /* ── HEADER ── */ 
+     header { 
+       display: grid; 
+       grid-template-columns: 1fr auto; 
+       align-items: end; 
+       gap: 24px; 
+       border-bottom: 2px solid var(--accent); 
+       padding-bottom: 30px; 
+       margin-bottom: 40px; 
+     } 
+     .name { 
+       font-family: 'Playfair Display', serif; 
+       font-size: 2.8rem; 
+       font-weight: 700; 
+       line-height: 1.1; 
+       color: #000;
+     } 
+     .name span { color: var(--accent); } 
+     .title-tag { 
+       font-size: .9rem; 
+       font-weight: 500; 
+       letter-spacing: .1em; 
+       text-transform: uppercase; 
+       color: var(--muted); 
+       margin-top: 8px; 
+     } 
+     .contact-info { 
+       text-align: right; 
+       font-size: .85rem; 
+       color: #333; 
+       line-height: 1.8; 
+     } 
+     .contact-info a { color: var(--accent2); text-decoration: none; font-weight: 500; } 
+  
+     /* ── SECTIONS ── */ 
+     section { margin-bottom: 35px; } 
+     .section-label { 
+       font-size: .75rem; 
+       font-weight: 700; 
+       letter-spacing: .15em; 
+       text-transform: uppercase; 
+       color: var(--accent); 
+       margin-bottom: 15px; 
+       display: flex; 
+       align-items: center; 
+       gap: 10px; 
+     } 
+     .section-label::after { 
+       content: ''; 
+       flex: 1; 
+       height: 1px; 
+       background: var(--border); 
+     } 
+  
+     /* ── ABOUT ── */ 
+     .about-text { 
+       font-size: 1rem; 
+       color: #333; 
+       text-align: justify;
+     } 
+  
+     /* ── EXPERIENCE ── */ 
+     .exp-item { 
+       display: grid; 
+       grid-template-columns: 1fr auto; 
+       gap: 8px; 
+       margin-bottom: 20px; 
+     } 
+     .exp-title { 
+       font-family: 'Playfair Display', serif; 
+       font-size: 1.1rem; 
+       font-weight: 700; 
+       color: #000;
+     } 
+     .exp-place { font-size: .9rem; color: #444; font-weight: 500; } 
+     .exp-date { 
+       font-size: .85rem; 
+       color: var(--accent); 
+       font-weight: 700; 
+     } 
+     .exp-desc { 
+       font-size: .9rem; 
+       color: #444; 
+       margin-top: 5px; 
+       grid-column: 1 / -1; 
+     } 
+     .exp-desc ul { padding-left: 20px; } 
+  
+     /* ── SKILLS GRID ── */ 
+     .skills-grid { 
+       display: grid; 
+       grid-template-columns: repeat(3, 1fr); 
+       gap: 15px; 
+     } 
+     .skill-card { 
+       background: var(--card); 
+       border: 1px solid var(--border); 
+       border-radius: 8px; 
+       padding: 12px; 
+     } 
+     .skill-name { 
+       font-size: .9rem; 
+       font-weight: 700; 
+       margin-bottom: 3px; 
+       color: #000;
+     } 
+     .skill-desc { font-size: .8rem; color: var(--muted); line-height: 1.4; } 
+  
+     /* ── TECH STACK ── */ 
+     .stack-row { 
+       display: grid; 
+       grid-template-columns: 120px 1fr; 
+       margin-bottom: 10px; 
+       font-size: .9rem; 
+     } 
+     .stack-cat { color: var(--muted); font-weight: 700; } 
+     .tag { 
+       color: var(--accent2); 
+       font-weight: 700;
+       margin-right: 10px;
+     } 
+  
+     /* ── PROJECTS ── */ 
+     .projects-grid { 
+       display: grid; 
+       grid-template-columns: repeat(2, 1fr); 
+       gap: 15px; 
+     } 
+     .proj-card { 
+       border: 1px solid var(--border); 
+       padding: 15px; 
+       border-radius: 8px;
+     } 
+     .proj-title { 
+       font-family: 'Playfair Display', serif; 
+       font-size: 1rem; 
+       font-weight: 700;
+       margin-bottom: 5px; 
+     } 
+     .proj-desc { font-size: .85rem; color: #444; } 
+  
+     /* ── CERTIFICATIONS ── */ 
+     .cert-item { 
+       display: flex; 
+       justify-content: space-between; 
+       padding: 8px 0; 
+       border-bottom: 1px solid var(--border); 
+       font-size: .9rem; 
+     } 
+     .cert-name { font-weight: 500; color: #000; } 
+     .cert-date { color: var(--accent); font-weight: 700; } 
+  
+     /* ── TESTIMONIALS ── */ 
+     .test-card { 
+       border-left: 3px solid var(--accent);
+       padding: 10px 15px; 
+       margin-bottom: 15px;
+       background: var(--surface);
+     } 
+     .test-quote { font-size: .85rem; color: #444; font-style: italic; margin-bottom: 5px; } 
+     .test-author { font-weight: 700; font-size: .85rem; color: #000; } 
+     .test-role { color: var(--muted); font-size: .8rem; } 
+  
+     footer { 
+       text-align: center; 
+       color: var(--muted); 
+       font-size: .8rem; 
+       padding-top: 30px; 
+       margin-top: 20px;
+       border-top: 1px solid var(--border); 
+     } 
+   </style> 
+ </head> 
+ <body> 
+   <div class="page"> 
+     <header> 
+       <div> 
+         <div class="name">Jhon <span>Alejandro</span><br>Jojoa Molina</div> 
+         <div class="title-tag">Estudiante de Ingeniería de Software</div> 
+       </div> 
+       <div class="contact-info"> 
+         <div><a href="mailto:am5314284@gmail.com">am5314284@gmail.com</a></div> 
+         <div>323 600 0339</div> 
+         <div><a href="https://github.com/Alejandro20202" target="_blank">github.com/Alejandro20202</a></div> 
+         <div>Colombia — Pasto</div> 
+         <div>Universidad Cooperativa de Colombia</div> 
+       </div> 
+     </header> 
+  
+     <section> 
+       <div class="section-label">Sobre Mí</div> 
+       <p class="about-text"> 
+         Soy estudiante de Ingeniería de Software con interés en la tecnología y el aprendizaje continuo. 
+         Me considero una persona responsable, comprometida y con muchas ganas de seguir creciendo en el área 
+         de desarrollo de software. Mi objetivo es fortalecer mis conocimientos en programación, diseño de interfaces 
+         y desarrollo de aplicaciones para crear soluciones útiles e innovadoras. Fuera del código, practico deporte 
+         —lo que me ha desarrollado disciplina y trabajo en equipo— y soy apasionado de la música. 
+       </p> 
+     </section> 
+  
+     <section> 
+       <div class="section-label">Formación & Experiencia</div> 
+       <div class="exp-item"> 
+         <div> 
+           <div class="exp-title">Ingeniería de Software</div> 
+           <div class="exp-place">Universidad Cooperativa de Colombia</div> 
+           <div class="exp-desc"> 
+             Formación académica enfocada en desarrollo de software, diseño de interfaces, análisis de sistemas 
+             y metodologías ágiles. 
+           </div> 
+         </div> 
+         <div class="exp-date">En curso — 2026</div> 
+       </div> 
+       <div class="exp-item"> 
+         <div> 
+           <div class="exp-title">Proyectos Académicos</div> 
+           <div class="exp-place">Desarrollo de Software</div> 
+           <div class="exp-desc"> 
+             <ul> 
+               <li>Investigación y desarrollo en diseño de interfaces de usuario</li> 
+               <li>Creación de wireframes para aplicaciones web y móviles</li> 
+               <li>Desarrollo de habilidades blandas: trabajo en equipo y liderazgo</li> 
+             </ul> 
+           </div> 
+         </div> 
+         <div class="exp-date">2024 — Presente</div> 
+       </div> 
+     </section> 
+  
+     <section> 
+       <div class="section-label">Habilidades</div> 
+       <div class="skills-grid"> 
+         <div class="skill-card"><div class="skill-name">Programación</div><div class="skill-desc">Conocimientos en desarrollo de software</div></div> 
+         <div class="skill-card"><div class="skill-name">Diseño UI/UX</div><div class="skill-desc">Diseño de interfaces y experiencia de usuario</div></div> 
+         <div class="skill-card"><div class="skill-name">Wireframes</div><div class="skill-desc">Estructuras para aplicaciones web y móviles</div></div> 
+       </div> 
+     </section> 
+  
+     <section> 
+       <div class="section-label">Stack Tecnológico</div> 
+       <div class="stack-row"><span class="stack-cat">Frontend:</span> <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript</span><span class="tag">React</span></div> 
+       <div class="stack-row"><span class="stack-cat">Frameworks:</span> <span class="tag">Tailwind CSS</span><span class="tag">React Router</span></div> 
+       <div class="stack-row"><span class="stack-cat">Herramientas:</span> <span class="tag">Git</span><span class="tag">GitHub</span><span class="tag">Figma</span></div> 
+     </section> 
+  
+     <section> 
+       <div class="section-label">Proyectos Destacados</div> 
+       <div class="projects-grid"> 
+         <div class="proj-card"><div class="proj-title">Cali — App Web</div><div class="proj-desc">Aplicación moderna con tecnologías actuales e interfaz intuitiva.</div></div> 
+         <div class="proj-card"><div class="proj-title">Diseño UI/UX</div><div class="proj-desc">Análisis y creación de interfaces centradas en el usuario.</div></div> 
+       </div> 
+     </section> 
+  
+     <section> 
+       <div class="section-label">Certificaciones</div> 
+       <div class="cert-item"><span class="cert-name">Seminario Nacional Ingeniería de Software III</span><span class="cert-date">Oct 2025</span></div> 
+       <div class="cert-item"><span class="cert-name">Seminario Nacional Ingeniería de Software II</span><span class="cert-date">May 2025</span></div> 
+     </section> 
+  
+     <footer> 
+       <p>© 2026 Jhon Alejandro Jojoa Molina — Estudiante de Ingeniería de Software</p> 
+     </footer> 
+   </div> 
+ </body> 
+ </html>
