@@ -385,9 +385,9 @@ function PortfolioContent() {
             transition={{ delay: 0.4, duration: 0.8 }}
             className="relative flex justify-center md:justify-end"
           >
-            <div className={`relative w-64 h-64 sm:w-80 sm:h-80 rounded-full p-1 bg-gradient-to-tr ${themeClasses.progress} shadow-2xl overflow-hidden group`}>
+            <div className={`relative w-64 h-64 sm:w-80 sm:h-80 rounded-3xl p-1 bg-gradient-to-tr ${themeClasses.progress} shadow-2xl overflow-hidden group`}>
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent blur-xl group-hover:rotate-180 transition-transform duration-1000" />
-              <div className="w-full h-full rounded-full overflow-hidden border-4 border-white/10 relative z-10">
+              <div className="w-full h-full rounded-2xl overflow-hidden border-4 border-white/10 relative z-10">
                 <img
                   src={profileImage}
                   alt="Jhon Alejandro Jojoa Molina"
@@ -997,7 +997,10 @@ function PortfolioContent() {
                   </div>
                 </motion.a>
 
-                <motion.div
+                <motion.a
+                  href="https://www.linkedin.com/in/alejandro-molina-239b9b401"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   whileHover={{ scale: 1.05 }}
                   className={`flex items-center gap-4 p-6 ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-gradient-to-br from-orange-50 to-orange-100'} rounded-xl hover:shadow-lg transition-all`}
                 >
@@ -1008,7 +1011,7 @@ function PortfolioContent() {
                     <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'} text-sm mb-1`}>{t.contact.linkedin}</div>
                     <div className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{t.contact.linkedinText}</div>
                   </div>
-                </motion.div>
+                </motion.a>
               </div>
 
               <div className={`mt-8 p-6 ${theme === 'dark' ? 'bg-slate-700/50' : 'bg-gradient-to-r from-blue-50 to-purple-50'} rounded-xl`}>
@@ -1024,7 +1027,10 @@ function PortfolioContent() {
       {/* Footer */}
       <footer className={`${theme === 'dark' ? 'bg-slate-950 border-t border-slate-800' : 'bg-gray-900'} text-white py-12 px-4`}>
         <div className="max-w-6xl mx-auto text-center">
-          <div className="flex justify-center gap-6 mb-8">
+          <div className="text-gray-400 mb-6 text-lg font-medium">
+            2026 {t.footer.rights}
+          </div>
+          <div className="flex justify-center gap-6">
             <a
               href="https://github.com/Alejandro20202"
               target="_blank"
@@ -1051,12 +1057,6 @@ function PortfolioContent() {
               <Linkedin className="w-6 h-6" />
             </a>
           </div>
-          <div className="text-2xl font-bold text-gray-400 mb-2">
-            2026
-          </div>
-          <p className="text-gray-500 text-sm">
-            {t.footer.rights}
-          </p>
         </div>
       </footer>
     </div>
