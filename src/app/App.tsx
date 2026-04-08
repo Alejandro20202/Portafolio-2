@@ -383,17 +383,20 @@ function PortfolioContent() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="relative"
+            className="relative flex justify-center md:justify-end"
           >
-            <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl">
-              <img
-                src={profileImage}
-                alt="Jhon Alejandro Jojoa Molina"
-                className="w-full h-full object-cover"
-              />
+            <div className={`relative w-64 h-64 sm:w-80 sm:h-80 rounded-full p-1 bg-gradient-to-tr ${themeClasses.progress} shadow-2xl overflow-hidden group`}>
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent blur-xl group-hover:rotate-180 transition-transform duration-1000" />
+              <div className="w-full h-full rounded-full overflow-hidden border-4 border-white/10 relative z-10">
+                <img
+                  src={profileImage}
+                  alt="Jhon Alejandro Jojoa Molina"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+              </div>
             </div>
-            <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-3xl -z-10" />
-            <div className="absolute -top-6 -left-6 w-48 h-48 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-full blur-3xl -z-10" />
+            <div className={`absolute -bottom-10 -right-10 w-64 h-64 bg-gradient-to-br ${themeClasses.accent} opacity-20 rounded-full blur-3xl -z-10`} />
+            <div className={`absolute -top-10 -left-10 w-64 h-64 bg-gradient-to-br ${themeClasses.progress} opacity-20 rounded-full blur-3xl -z-10`} />
           </motion.div>
         </div>
 
@@ -778,11 +781,11 @@ function PortfolioContent() {
               <h3 className="text-lg text-gray-400 mb-4 text-center font-medium">{t.technologies.frontend}</h3>
               <div className="flex flex-wrap justify-center gap-4">
                 {[
-                  { name: 'HTML5', icon: '🌐', color: 'from-orange-500 to-red-500' },
-                  { name: 'CSS3', icon: '🎨', color: 'from-blue-500 to-cyan-500' },
-                  { name: 'JavaScript', icon: '⚡', color: 'from-yellow-400 to-orange-500' },
-                  { name: 'TypeScript', icon: '📘', color: 'from-blue-600 to-blue-700' },
-                  { name: 'React', icon: '⚛️', color: 'from-cyan-400 to-blue-500' },
+                  { name: 'HTML5', icon: <div className="w-8 h-8 flex items-center justify-center text-[#E34F26]"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.5 0h21l-1.91 21.563L11.977 24l-8.564-2.438L1.5 0zm7.031 9.75l-.232-2.718 10.059.003.23-2.622L5.412 4.41l.698 8.01h9.126l-.326 3.426-2.91.804-2.955-.81-.188-2.11H6.248l.33 4.171L12 19.351l5.379-1.443.744-8.157H8.531z"/></svg></div>, color: 'from-orange-500 to-red-500' },
+                  { name: 'CSS3', icon: <div className="w-8 h-8 flex items-center justify-center text-[#1572B6]"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.5 0h21l-1.91 21.563L11.977 24l-8.564-2.438L1.5 0zm7.031 9.75l-.232-2.718 10.059.003.23-2.622L5.412 4.41l.698 8.01h9.126l-.326 3.426-2.91.804-2.955-.81-.188-2.11H6.248l.33 4.171L12 19.351l5.379-1.443.744-8.157H8.531z"/></svg></div>, color: 'from-blue-500 to-cyan-500' },
+                  { name: 'JavaScript', icon: <div className="w-8 h-8 flex items-center justify-center text-[#F7DF1E]"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h24v24H0V0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.045-.705.15-.645.975-.75 1.53-.675.735.09 1.2.555 1.35 1.14.33-.135.66-.27.975-.405-.21-1.244-1.245-1.935-2.445-1.935-1.156 0-2.146.615-2.326 1.74-.06.42-.045.705.105.99.27.57.825.945 1.725 1.305 1.275.51 1.875.93 1.875 1.575 0 .555-.45 1.035-1.56 1.035-1.275 0-1.815-.555-2.085-1.185-.345.15-.66.3-.975.435.42 1.2 1.32 1.74 2.895 1.74 2.085 0 2.895-1.185 2.73-2.22zm-8.351-5.146h-.975c0 2.497-.033 4.867-.033 7.41-.135.03-.27.045-.42.045-1.485 0-1.77-.765-1.77-2.145 0-.585.045-1.2.045-1.8h-.945c0 .6.015 1.2.015 1.92 0 2.145.51 2.985 2.715 2.985.465 0 .9-.045 1.41-.135v-8.31z"/></svg></div>, color: 'from-yellow-400 to-orange-500' },
+                  { name: 'TypeScript', icon: <div className="w-8 h-8 flex items-center justify-center text-[#3178C6]"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.125 0C.502 0 0 .502 0 1.125v21.75C0 23.498.502 24 1.125 24h21.75c.623 0 1.125-.502 1.125-1.125V1.125C24 .502 23.498 0 22.875 0H1.125zm17.363 9.75c.612 0 1.154.037 1.627.111v2.111c-.524-.124-1.087-.186-1.687-.186-1.374 0-2.062.611-2.062 1.833v5.131h-2.425V9.91h2.281v1.178c.475-.872 1.231-1.338 2.266-1.338zm-7.026 0c.549 0 1.033.045 1.45.135v2.131c-.487-.18-1.012-.27-1.575-.27-.855 0-1.283.293-1.283.878 0 .435.251.742.754.922l1.395.48c1.343.465 2.014 1.253 2.014 2.363 0 1.185-.717 2.07-2.152 2.655-.548.225-1.193.338-1.935.338-.637 0-1.222-.053-1.755-.158v-2.281c.547.233 1.185.353 1.912.353.945 0 1.418-.3 1.418-.9 0-.42-.293-.728-.878-.923l-1.35-.48c-1.35-.488-2.025-1.253-2.025-2.295 0-1.17.713-2.033 2.138-2.588.517-.202 1.102-.308 1.754-.308z"/></svg></div>, color: 'from-blue-600 to-blue-700' },
+                  { name: 'React', icon: <div className="w-8 h-8 flex items-center justify-center text-[#61DAFB]"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12c0 1.23-.3 2.4-.85 3.44l-1.83-1.06c.43-.76.68-1.55.68-2.38 0-2.76-2.24-5-5-5-1.23 0-2.4.3-3.44.85l-1.06-1.83C13.44 5.3 14.6 5 15.83 5c4.42 0 8 3.58 8 8zm-8.17 6.15c-1.04.55-2.21.85-3.44.85-4.42 0-8-3.58-8-8 0-1.23.3-2.4.85-3.44l1.83 1.06c-.43.76-.68 1.55-.68 2.38 0 2.76 2.24 5 5 5 1.23 0 2.4-.3 3.44-.85l1.06 1.83zM12 10.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5z"/></svg></div>, color: 'from-cyan-400 to-blue-500' },
                 ].map((tech, index) => (
                   <motion.div
                     key={index}
@@ -793,8 +796,8 @@ function PortfolioContent() {
                     whileHover={{ scale: 1.05, y: -2 }}
                     className="relative group"
                   >
-                    <div className="bg-white/10 backdrop-blur-sm rounded-full px-5 py-2.5 hover:bg-white/20 transition-all border border-white/20 flex items-center gap-2">
-                      <span className="text-2xl">{tech.icon}</span>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-full px-5 py-2.5 hover:bg-white/20 transition-all border border-white/20 flex items-center gap-3">
+                      {tech.icon}
                       <span className="text-white font-medium text-sm">{tech.name}</span>
                     </div>
                     <div className={`absolute inset-0 bg-gradient-to-r ${tech.color} opacity-0 group-hover:opacity-30 rounded-full transition-opacity blur-md`}></div>
@@ -808,10 +811,10 @@ function PortfolioContent() {
               <h3 className="text-lg text-gray-400 mb-4 text-center font-medium">{t.technologies.frameworks}</h3>
               <div className="flex flex-wrap justify-center gap-4">
                 {[
-                  { name: 'Next.js', icon: '▲', color: 'from-gray-700 to-gray-900' },
-                  { name: 'Tailwind CSS', icon: '💨', color: 'from-teal-400 to-cyan-500' },
-                  { name: 'Motion', icon: '🎬', color: 'from-pink-500 to-purple-500' },
-                  { name: 'React Router', icon: '🛣️', color: 'from-red-500 to-pink-500' },
+                  { name: 'Next.js', icon: <div className="w-8 h-8 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.182 18.252l-6.853-8.825v7.456h-1.488v-10.37h1.488l6.853 8.825v-7.456h1.488v10.37h-1.488z"/></svg></div>, color: 'from-gray-700 to-gray-900' },
+                  { name: 'Tailwind CSS', icon: <div className="w-8 h-8 flex items-center justify-center text-[#06B6D4]"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.001 4.8c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624C13.666 10.618 15.027 12 18.001 12c3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C16.337 6.182 14.976 4.8 12.001 4.8zm-6 7.2c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624 1.177 1.194 2.538 2.576 5.512 2.576 3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C10.337 13.382 8.976 12 6.001 12z"/></svg></div>, color: 'from-teal-400 to-cyan-500' },
+                  { name: 'Motion', icon: <div className="w-8 h-8 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M0 14.787L9.426 24.213L24 9.639L14.574.213L0 14.787Z"/></svg></div>, color: 'from-pink-500 to-purple-500' },
+                  { name: 'React Router', icon: <div className="w-8 h-8 flex items-center justify-center text-[#CA4245]"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 18c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"/></svg></div>, color: 'from-red-500 to-pink-500' },
                 ].map((tech, index) => (
                   <motion.div
                     key={index}
@@ -822,8 +825,8 @@ function PortfolioContent() {
                     whileHover={{ scale: 1.05, y: -2 }}
                     className="relative group"
                   >
-                    <div className="bg-white/10 backdrop-blur-sm rounded-full px-5 py-2.5 hover:bg-white/20 transition-all border border-white/20 flex items-center gap-2">
-                      <span className="text-2xl">{tech.icon}</span>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-full px-5 py-2.5 hover:bg-white/20 transition-all border border-white/20 flex items-center gap-3">
+                      {tech.icon}
                       <span className="text-white font-medium text-sm">{tech.name}</span>
                     </div>
                     <div className={`absolute inset-0 bg-gradient-to-r ${tech.color} opacity-0 group-hover:opacity-30 rounded-full transition-opacity blur-md`}></div>
@@ -837,11 +840,9 @@ function PortfolioContent() {
               <h3 className="text-lg text-gray-400 mb-4 text-center font-medium">{t.technologies.tools}</h3>
               <div className="flex flex-wrap justify-center gap-4">
                 {[
-                  { name: 'Git', icon: '🔧', color: 'from-orange-500 to-red-600' },
-                  { name: 'GitHub', icon: '🐙', color: 'from-gray-600 to-gray-800' },
-                  { name: 'Vercel', icon: '🚀', color: 'from-black to-gray-800' },
-                  { name: 'Figma', icon: '🎨', color: 'from-purple-500 to-pink-500' },
-                  { name: 'VS Code', icon: '💻', color: 'from-blue-500 to-cyan-500' },
+                  { name: 'Git', icon: <div className="w-8 h-8 flex items-center justify-center text-[#F05032]"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.546 10.93L13.067.452c-.604-.603-1.582-.603-2.187 0L8.708 2.624l2.76 2.76c.645-.215 1.379-.07 1.889.441.516.515.658 1.258.438 1.9l2.658 2.66c.645-.223 1.387-.078 1.9.435.721.72 1.127 1.684 1.127 2.674 0 .99-.406 1.954-1.127 2.674-.722.722-1.685 1.128-2.675 1.128-.99 0-1.953-.406-2.674-1.128-.722-.72-.128-1.685-1.128-2.674 0-.99.406-1.954 1.128-2.674.512-.511 1.255-.653 1.895-.433l-2.66-2.66c-.22.22-.654.438-1.295.438-.515-.516-.658-1.258-.438-1.9l-2.76-2.76-6.199 6.199c-.604.605-.604 1.584 0 2.188l10.479 10.479c.604.604 1.582.604 2.187 0l10.479-10.479c.604-.604.604-1.582 0-2.187z"/></svg></div>, color: 'from-orange-500 to-red-600' },
+                  { name: 'GitHub', icon: <div className="w-8 h-8 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.82 1.102.82 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></div>, color: 'from-gray-600 to-gray-800' },
+                  { name: 'Figma', icon: <div className="w-8 h-8 flex items-center justify-center text-[#F24E1E]"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 24c3.314 0 6-2.686 6-6V6c0-3.314-2.686-6-6-6S6 2.686 6 6v12c0 3.314 2.686 6 6 6zM6 6c0-1.657 1.343-3 3-3s3 1.343 3 3-1.343 3-3 3-3-1.343-3-3zm0 12c0-1.657 1.343-3 3-3s3 1.343 3 3-1.343 3-3 3-3-1.343-3-3zm3-9c1.657 0 3 1.343 3 3s-1.343 3-3 3-3-1.343-3-3 1.343-3 3-3z"/></svg></div>, color: 'from-purple-500 to-pink-500' },
                 ].map((tech, index) => (
                   <motion.div
                     key={index}
@@ -852,8 +853,8 @@ function PortfolioContent() {
                     whileHover={{ scale: 1.05, y: -2 }}
                     className="relative group"
                   >
-                    <div className="bg-white/10 backdrop-blur-sm rounded-full px-5 py-2.5 hover:bg-white/20 transition-all border border-white/20 flex items-center gap-2">
-                      <span className="text-2xl">{tech.icon}</span>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-full px-5 py-2.5 hover:bg-white/20 transition-all border border-white/20 flex items-center gap-3">
+                      {tech.icon}
                       <span className="text-white font-medium text-sm">{tech.name}</span>
                     </div>
                     <div className={`absolute inset-0 bg-gradient-to-r ${tech.color} opacity-0 group-hover:opacity-30 rounded-full transition-opacity blur-md`}></div>
@@ -1021,27 +1022,37 @@ function PortfolioContent() {
       </section>
 
       {/* Footer */}
-      <footer className={`${theme === 'dark' ? 'bg-slate-950 border-t border-slate-800' : 'bg-gray-900'} text-white py-8 px-4`}>
+      <footer className={`${theme === 'dark' ? 'bg-slate-950 border-t border-slate-800' : 'bg-gray-900'} text-white py-12 px-4`}>
         <div className="max-w-6xl mx-auto text-center">
-          <div className={`text-xl mb-4 bg-gradient-to-r ${themeClasses.progress} bg-clip-text text-transparent font-bold`}>
-            {t.footer.name}
-          </div>
-          <p className="text-gray-400 mb-4">{t.footer.role}</p>
-          <div className="flex justify-center gap-4 mb-4">
-            <a
-              href="mailto:am5314284@gmail.com"
-              className={`w-10 h-10 ${theme === 'dark' ? 'bg-slate-800 hover:bg-blue-600' : 'bg-gray-800 hover:bg-blue-600'} rounded-full flex items-center justify-center transition-colors`}
-            >
-              <Mail className="w-5 h-5" />
-            </a>
+          <div className="flex justify-center gap-6 mb-8">
             <a
               href="https://github.com/Alejandro20202"
               target="_blank"
               rel="noopener noreferrer"
-              className={`w-10 h-10 ${theme === 'dark' ? 'bg-slate-800 hover:bg-blue-600' : 'bg-gray-800 hover:bg-blue-600'} rounded-full flex items-center justify-center transition-colors`}
+              className={`w-12 h-12 ${theme === 'dark' ? 'bg-slate-800 hover:bg-blue-600' : 'bg-gray-800 hover:bg-blue-600'} rounded-full flex items-center justify-center transition-all hover:scale-110 shadow-lg`}
+              title="GitHub"
             >
-              <Github className="w-5 h-5" />
+              <Github className="w-6 h-6" />
             </a>
+            <a
+              href="mailto:am5314284@gmail.com"
+              className={`w-12 h-12 ${theme === 'dark' ? 'bg-slate-800 hover:bg-blue-600' : 'bg-gray-800 hover:bg-blue-600'} rounded-full flex items-center justify-center transition-all hover:scale-110 shadow-lg`}
+              title="Email"
+            >
+              <Mail className="w-6 h-6" />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/alejandro-molina-239b9b401"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`w-12 h-12 ${theme === 'dark' ? 'bg-slate-800 hover:bg-blue-600' : 'bg-gray-800 hover:bg-blue-600'} rounded-full flex items-center justify-center transition-all hover:scale-110 shadow-lg`}
+              title="LinkedIn"
+            >
+              <Linkedin className="w-6 h-6" />
+            </a>
+          </div>
+          <div className="text-2xl font-bold text-gray-400 mb-2">
+            2026
           </div>
           <p className="text-gray-500 text-sm">
             {t.footer.rights}
