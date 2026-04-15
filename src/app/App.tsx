@@ -51,14 +51,40 @@ function PortfolioContent() {
   };
 
   const downloadCV = async () => {
-    // Abrir el CV en una nueva pestaña y luego pedir que lo guarden como PDF
-    // Esto es mucho más robusto y rápido que html2pdf que a veces se bloquea
-    const link = document.createElement('a');
-    link.href = '/cv.html';
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const fileName = 'CV-Jhon-Alejandro-Jojoa-Molina.pdf';
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.left = '-9999px';
+      iframe.style.width = '210mm';
+      iframe.style.height = '297mm';
+      iframe.src = '/cv.html';
+      document.body.appendChild(iframe);
+
+      await new Promise<void>((resolve, reject) => {
+        iframe.onload = () => resolve();
+        iframe.onerror = () => reject(new Error('No se pudo cargar el CV para la descarga'));
+      });
+
+      const doc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!doc?.body) {
+        throw new Error('No se pudo leer el contenido del CV');
+      }
+
+      await html2pdf()
+        .from(doc.body)
+        .set({
+          margin: 10,
+          filename: fileName,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        })
+        .save();
+    } catch (error) {
+      console.error(error);
+      alert('No se pudo descargar el CV. Intenta abrirlo manualmente y guardarlo como PDF.');
+    }
   };
 
   const navItems = [
